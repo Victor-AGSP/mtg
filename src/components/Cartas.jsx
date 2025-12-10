@@ -4,6 +4,7 @@ import { IoIosAdd } from "react-icons/io";
 import Favorites from "./Favorites";
 import FilterSection from "./FilterSection";
 import { useUser } from "./UserContext";
+import { BACKEND_ENDPOINTS } from "../config/backend";
 
 const Cartas = () => {
   const { userId } = useUser();
@@ -36,10 +37,12 @@ const Cartas = () => {
   const toggleFilters = () => setShowFilters(!showFilters);
 
   const fetchFavorites = useCallback(async () => {
+    if (!userId) {
+      setFavorites([]);
+      return;
+    }
     try {
-      const response = await fetch(
-        `https://magicarduct.online:3000/api/cartasfavoritas/${userId}`,
-      );
+      const response = await fetch(BACKEND_ENDPOINTS.getFavorites(userId));
       if (!response.ok) throw new Error("Error en la solicitud");
       const data = await response.json();
       setFavorites(Array.isArray(data) ? data : []);
@@ -52,9 +55,7 @@ const Cartas = () => {
   const fetchDecks = useCallback(async () => {
     if (!userId) return;
     try {
-      const response = await fetch(
-        `https://magicarduct.online:3000/api/barajasdeusuaio2/${userId}`,
-      );
+      const response = await fetch(BACKEND_ENDPOINTS.getDecks(userId));
       if (!response.ok) throw new Error("Error al obtener las barajas");
       const data = await response.json();
       setDecks(data);
@@ -85,9 +86,12 @@ const Cartas = () => {
     const typeQuery = filter.type ? `+type:${filter.type}` : "";
     const editionQuery = filter.edition ? `+set:${filter.edition}` : "";
     const subtypeQuery = filter.subtype ? `+type:${filter.subtype}` : "";
+    
+    // Si no hay búsqueda ni filtros, usar * para obtener todas las cartas
+    const query = searchQuery || "*";
 
     fetch(
-      `https://api.scryfall.com/cards/search?q=${encodeURIComponent(searchQuery)}${colorsQuery}${cdmQuery}${powerQuery}${toughnessQuery}${typeQuery}${editionQuery}${subtypeQuery}&order=${filter.order}&dir=${filter.dir}`,
+      `https://api.scryfall.com/cards/search?q=${encodeURIComponent(query)}${colorsQuery}${cdmQuery}${powerQuery}${toughnessQuery}${typeQuery}${editionQuery}${subtypeQuery}&order=${filter.order}&dir=${filter.dir}`,
     )
       .then((res) => res.json())
       .then((data) => {
@@ -144,7 +148,7 @@ const Cartas = () => {
     setSelectedDeck(deck);
     try {
       const response = await fetch(
-        `https://magicarduct.online:3000/api/mazocartas/${deck.idbarajas}`,
+        BACKEND_ENDPOINTS.getDeckCards(deck.idbarajas),
       );
       const deckCards = await response.json();
       const cardExistsInDeck = deckCards.some(
@@ -168,7 +172,7 @@ const Cartas = () => {
   const handleAddCardsToDeck = async () => {
     if (!selectedDeck || !cardToAdd) return;
     try {
-      await fetch("https://magicarduct.online:3000/api/agregarcartas", {
+      await fetch(BACKEND_ENDPOINTS.addCardToDeck, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -185,7 +189,7 @@ const Cartas = () => {
 
   const addFavorite = async (card) => {
     try {
-      await fetch(`https://magicarduct.online:3000/api/cartasfavoritas`, {
+      await fetch(BACKEND_ENDPOINTS.addFavorite, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ IDusuario: userId, IDcarta: card.id }),
@@ -199,7 +203,7 @@ const Cartas = () => {
   const removeFavorite = async (cardId) => {
     try {
       await fetch(
-        `https://magicarduct.online:3000/api/cartasfavoritas/${userId}/${cardId}`,
+        BACKEND_ENDPOINTS.deleteFavorite(userId, cardId),
         {
           method: "DELETE",
         },

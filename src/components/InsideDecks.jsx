@@ -7,6 +7,7 @@ import { IoIosAdd } from "react-icons/io";
 import ScaleLoader from "react-spinners/ScaleLoader";
 import InsideDecksProperties from "./InsideDecksProperties";
 import { useNavigate } from "react-router-dom";
+import { BACKEND_ENDPOINTS } from '../config/backend';
 
 const InsideDecks = ({ closeModal, deckName, deckId }) => {
   const modalRef = useRef(null);
@@ -24,7 +25,7 @@ const InsideDecks = ({ closeModal, deckName, deckId }) => {
   const fetchDeckCards = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`https://magicarduct.online:3000/api/mazocartas/${deckId}`);
+      const response = await fetch(BACKEND_ENDPOINTS.getDeckCards(deckId));
       if (!response.ok) {
         throw new Error("Error al obtener las cartas del mazo");
       }
@@ -122,7 +123,7 @@ const InsideDecks = ({ closeModal, deckName, deckId }) => {
   const deleteSelectedCards = async () => {
     for (const cardId of selectedCards) {
       try {
-        await fetch(`https://magicarduct.online:3000/api/eliminarmazocarta/${deckId}/${cardId}`, {
+        await fetch(BACKEND_ENDPOINTS.deleteCardFromDeck(deckId, cardId), {
           method: "DELETE"
         });
       } catch (error) {

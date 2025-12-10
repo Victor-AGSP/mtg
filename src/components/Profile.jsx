@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useUser } from './UserContext';
 import { useNavigate } from 'react-router-dom';
 import { FaPen } from 'react-icons/fa';
+import { BACKEND_ENDPOINTS } from '../config/backend';
 import image1 from '../assets/azul.png';
 import image2 from '../assets/verde.png';
 import image3 from '../assets/negro.png';
@@ -51,7 +52,7 @@ function Profile() {
         return; // Si no hay usuario, no hacemos nada
       }
       try {
-        const response = await fetch(`https://magicarduct.online:3000/api/barajasdeusuaio2/${userId}`);
+        const response = await fetch(BACKEND_ENDPOINTS.getDecks(userId));
         if (response.ok) {
           const data = await response.json();
           setDecks(data); // Almacenar las barajas en el estado
@@ -69,7 +70,7 @@ function Profile() {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await fetch(`https://magicarduct.online:3000/obtener-usuario?userId=${userId}`, {
+        const response = await fetch(BACKEND_ENDPOINTS.getUser(userId), {
           method: 'GET',
           credentials: 'include',
         });
@@ -105,7 +106,7 @@ function Profile() {
       }
 
       try {
-        const response = await fetch(`https://magicarduct.online:3000/api/barajasdeusuaio2/${userId}`);
+        const response = await fetch(BACKEND_ENDPOINTS.getDecks(userId));
         if (response.ok) {
           const data = await response.json();
           setDecks(data);
@@ -126,7 +127,7 @@ function Profile() {
   
     try {
       // Petición a tu backend para obtener las cartas favoritas
-      const response = await fetch(`https://magicarduct.online:3000/api/cartasfavoritas/${userId}`);
+      const response = await fetch(BACKEND_ENDPOINTS.getFavorites(userId));
       if (!response.ok) {
         throw new Error("Error al obtener cartas favoritas");
       }
@@ -183,7 +184,7 @@ function Profile() {
 
   const handleDeleteFavoriteCard = async (cardId) => {
     try {
-      const response = await fetch(`https://magicarduct.online:3000/api/cartasfavoritas/${userId}/${cardId}`, {
+      const response = await fetch(BACKEND_ENDPOINTS.deleteFavorite(userId, cardId), {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -209,14 +210,14 @@ function Profile() {
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`https://magicarduct.online:3000/api/usuario/${userId}`, {
+      const response = await fetch(BACKEND_ENDPOINTS.updateUser(userId), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          nombre: editData.name,
-          imageNumber: editData.imageNumber,
+          userName: editData.name,
+          image: editData.imageNumber,
         }),
       });
 
@@ -276,7 +277,7 @@ function Profile() {
     if (newPassword === confirmPassword) {
         // Aquí llamas a tu endpoint de cambio de contraseña
         try {
-            const response = await fetch(`https://magicarduct.online:3000/api/actualizarpassword/${userId}`, {
+            const response = await fetch(BACKEND_ENDPOINTS.updatePassword(userId), {
                 method: 'PUT',
                 headers: {
                   'Content-Type': 'application/json',

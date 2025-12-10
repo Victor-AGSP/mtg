@@ -3,6 +3,7 @@ import { BiUser, BiEnvelope } from "react-icons/bi";
 import { AiOutlineUnlock, AiOutlineClose } from "react-icons/ai";
 import { useUser } from './UserContext'; // Asegúrate de importar el contexto
 import { useNavigate } from "react-router-dom";
+import { BACKEND_ENDPOINTS } from '../config/backend';
 
 const RegisterModal = ({ closeRegisterModal }) => {
   const [formData, setFormData] = useState({
@@ -38,13 +39,13 @@ const RegisterModal = ({ closeRegisterModal }) => {
 
     // Objeto con los datos del usuario
     const userData = {
-      nombre: username,
-      correo: email,
-      clave: password,
+      username: username,
+      email: email,
+      password: password,
     };
 
     // Petición POST al servidor
-    fetch('https://magicarduct.online:3000/register', {
+    fetch(BACKEND_ENDPOINTS.register, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -56,16 +57,13 @@ const RegisterModal = ({ closeRegisterModal }) => {
         if (data.error) {
           setErrorMessage(data.error);
         } else {
-          // Guardar el token en localStorage (o en cookies)
-          localStorage.setItem('token', data.token);
-
           // Iniciar sesión automáticamente
           const loginData = {
-            email: userData.correo,
-            password: userData.clave,
+            username: userData.username,
+            password: userData.password,
           };
 
-          return fetch('https://magicarduct.online:3000/login', {
+          return fetch(BACKEND_ENDPOINTS.login, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

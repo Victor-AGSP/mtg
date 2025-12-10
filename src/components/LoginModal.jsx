@@ -3,9 +3,10 @@ import { BiUser } from "react-icons/bi";
 import { AiOutlineUnlock } from "react-icons/ai";
 import { useUser } from './UserContext';
 import { useNavigate } from "react-router-dom";
+import { BACKEND_ENDPOINTS } from '../config/backend';
 
 const LoginModal = ({ closeLoginModal }) => {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [formData, setFormData] = useState({ username: "", password: "" });
   const { setUser } = useUser();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -21,12 +22,12 @@ const LoginModal = ({ closeLoginModal }) => {
     setLoading(true); // Set loading state to true
 
     try {
-      const response = await fetch('https://magicarduct.online:3000/login', {
+      const response = await fetch(BACKEND_ENDPOINTS.login, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email: formData.email, password: formData.password }),
+        body: JSON.stringify({ username: formData.username, password: formData.password }),
       });
 
       const result = await response.json();
@@ -52,14 +53,14 @@ const LoginModal = ({ closeLoginModal }) => {
         <form onSubmit={handleLogin}>
           <div className="relative my-8">
             <input
-              type="email"
-              name="email"
-              value={formData.email}
+              type="text"
+              name="username"
+              value={formData.username}
               onChange={handleChange}
               required
               className="block w-full py-2.5 px-0 text-sm text-[#e1e6ea] bg-transparent border-0 border-b-2 border-gray-600 appearance-none focus:border-[#2a5880] focus:outline-none peer"
             />
-            <label className="absolute text-sm text-[#e1e6ea] transition-all transform -translate-y-6 scale-75 top-3 left-0 -z-10 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Ingresa tu email</label>
+            <label className="absolute text-sm text-[#e1e6ea] transition-all transform -translate-y-6 scale-75 top-3 left-0 -z-10 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Ingresa tu usuario</label>
             <BiUser className="absolute top-3 right-2 text-xl text-[#e1e6ea]" />
           </div>
 

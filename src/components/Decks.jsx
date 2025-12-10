@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { IoMdAddCircle } from "react-icons/io";
 import { BsThreeDots } from "react-icons/bs"; // Ícono de tres puntos
 import { IoIosOptions } from "react-icons/io"; // Ícono de opciones
+import { BACKEND_ENDPOINTS } from '../config/backend';
 import imagen8 from '../images/imgNews/imagen8.webp'; // Imagen
 import { useUser } from './UserContext'; // Contexto para obtener el userId
 import InsideDecks from './InsideDecks'; // Importar InsideDecks para mostrarlo en el modal
@@ -33,7 +34,7 @@ const Decks = () => {
       }
 
       try {
-        const response = await fetch(`https://magicarduct.online:3000/api/barajasdeusuaio2/${userId}`);
+        const response = await fetch(BACKEND_ENDPOINTS.getDecks(userId));
         if (response.ok) {
           const data = await response.json();
           setDecks(data); // Almacenar las barajas en el estado
@@ -81,16 +82,15 @@ const Decks = () => {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch('https://magicarduct.online:3000/api/createmazo', {
+      const response = await fetch(BACKEND_ENDPOINTS.createDeck, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           nombre: newDeckName,
-          formato: 'standard', // Puedes cambiar el formato si es necesario
           descripcion: 'Nueva baraja creada por el usuario', // Descripción predeterminada
-          idusuario: userId, // Asocia la baraja al usuario actual
+          IDusuario: userId, // Asocia la baraja al usuario actual
         }),
       });
 
@@ -143,14 +143,13 @@ const Decks = () => {
     }
 
     try {
-      const response = await fetch(`https://magicarduct.online:3000/api/actualizarmazo/${renameDeckId}`, {
+      const response = await fetch(BACKEND_ENDPOINTS.updateDeck(renameDeckId), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           nombre: newDeckName,
-          formato: 'standard', // Puedes cambiar el formato si es necesario
           descripcion: 'Baraja renombrada por el usuario',
         }),
       });
@@ -175,7 +174,7 @@ const Decks = () => {
   // Función para eliminar una baraja
   const handleDeleteDeck = async (deckId) => {
     try {
-      const response = await fetch(`https://magicarduct.online:3000/api/eliminarmazo/${deckId}`, {
+      const response = await fetch(BACKEND_ENDPOINTS.deleteDeck(deckId), {
         method: 'DELETE',
       });
 
