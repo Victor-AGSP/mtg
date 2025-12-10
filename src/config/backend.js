@@ -5,8 +5,8 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || (typeof window !== 'und
 
 export const BACKEND_ENDPOINTS = {
   // Auth
-  login: `${BACKEND_URL}/api/auth/login`,
-  register: `${BACKEND_URL}/api/auth/register`,
+  login: `${BACKEND_URL}/api/auth?action=login`,
+  register: `${BACKEND_URL}/api/auth?action=register`,
   
   // Usuario
   getUser: (userId) => `${BACKEND_URL}/api/usuarios/${userId}`,
